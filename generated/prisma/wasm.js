@@ -125,7 +125,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\micha\\OneDrive\\Documents\\Khang\\Programming\\Classes\\Machine Learning\\webapp\\fake_job_post_detective\\generated\\prisma",
+      "value": "/workspaces/fake_job_post_detective/generated/prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -134,17 +134,16 @@ const config = {
     "binaryTargets": [
       {
         "fromEnvVar": null,
-        "value": "windows",
+        "value": "debian-openssl-1.1.x",
         "native": true
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\micha\\OneDrive\\Documents\\Khang\\Programming\\Classes\\Machine Learning\\webapp\\fake_job_post_detective\\prisma\\schema.prisma",
+    "sourceFilePath": "/workspaces/fake_job_post_detective/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": null,
-    "schemaEnvPath": "../../.env"
+    "rootEnvPath": null
   },
   "relativePath": "../../prisma",
   "clientVersion": "6.19.0",
@@ -153,6 +152,7 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {

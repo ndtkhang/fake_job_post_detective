@@ -28,4 +28,16 @@ export const postRouter = createTRPCRouter({
 
     return post ?? null;
   }),
+
+  // Parse job description using server-side LLM parser
+  parse: publicProcedure
+    .input(z.object({ text: z.string().min(1) }))
+    .mutation(async ({ input }) => {
+      // Lazy import to avoid pulling OpenAI/client code into every environment
+      const mod = await import("~/server/ml/parser");
+      const res = await mod.extractJobFieldsWithLLM(input.text);
+      // Post-process to match Kaggle training schema expectations
+      const formatted = mod.formatForKaggle(res);
+      return formatted;
+    }),
 });
