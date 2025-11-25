@@ -32,8 +32,8 @@ function FieldLegend({
       data-variant={variant}
       className={cn(
         "mb-3 font-medium",
-        "data-[variant=legend]:text-base",
-        "data-[variant=label]:text-sm",
+        "data-[variant=legend]:text-4xl",
+        "data-[variant=label]:text-md",
         className
       )}
       {...props}
