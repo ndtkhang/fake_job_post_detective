@@ -17,9 +17,7 @@ import {
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select"
@@ -42,9 +40,13 @@ export function JobPostForm() {
   const [hasQuestions, setHasQuestions] = useState(false)
   const [requiredEducation, setRequiredEducation] = useState(false)
 
+  async function handleSubmit(event: React.FormEvent) {
+    // TODO: Implement submission logic
+  }
+
   return (
     <div className="flex-7 px-8 py-8 bg-card rounded-[48px] shadow-medium">
-      <form>
+      <form onSubmit={handleSubmit}>
         <FieldGroup>
           <FieldSet>
             <FieldLegend>Job Post</FieldLegend>
@@ -57,11 +59,13 @@ export function JobPostForm() {
 
                 {/* Job Title */}
                 <Field>
-                  <FieldLabel htmlFor="checkout-7j9-card-name-43j">
+                  <FieldLabel htmlFor="job-title-input-field">
                     Job Title
                   </FieldLabel>
                   <Input
-                    id="checkout-7j9-card-name-43j"
+                    id="job-title-input-field"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
                     placeholder="e.g. React Developer"
                     required
                   />
@@ -69,11 +73,13 @@ export function JobPostForm() {
 
                 {/* Location */}
                 <Field>
-                  <FieldLabel htmlFor="checkout-7j9-card-name-43j">
+                  <FieldLabel htmlFor="location-input-field">
                     Location
                   </FieldLabel>
                   <Input
-                    id="checkout-7j9-card-name-43j"
+                    id="location-input-field"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
                     placeholder="e.g. New York, NY"
                     required
                   />
@@ -81,11 +87,11 @@ export function JobPostForm() {
 
                 {/* Job Type */}
                 <Field>
-                  <FieldLabel htmlFor="checkout-7j9-exp-year-f59">
+                  <FieldLabel htmlFor="employment-type-select">
                     Employment Type
                   </FieldLabel>
-                  <Select defaultValue="">
-                    <SelectTrigger id="checkout-7j9-exp-year-f59">
+                  <Select value={employmentType} onValueChange={setEmploymentType} defaultValue="Not Specified">
+                    <SelectTrigger id="employment-type-select">
                       <SelectValue placeholder="Not Specified" />
                     </SelectTrigger>
                     <SelectContent>
@@ -104,11 +110,13 @@ export function JobPostForm() {
 
                 {/* Industry */}
                 <Field>
-                  <FieldLabel htmlFor="checkout-7j9-card-name-43j">
+                  <FieldLabel htmlFor="industry-input-field">
                     Industry
                   </FieldLabel>
                   <Input
-                    id="checkout-7j9-card-name-43j"
+                    id="industry-input-field"
+                    value={industry}
+                    onChange={(e) => setIndustry(e.target.value)}
                     placeholder="e.g. Technology"
                     required
                   />
@@ -116,11 +124,13 @@ export function JobPostForm() {
 
                 {/* Department */}
                 <Field>
-                  <FieldLabel htmlFor="checkout-7j9-card-name-43j">
+                  <FieldLabel htmlFor="department-input-field">
                     Department
                   </FieldLabel>
                   <Input
-                    id="checkout-7j9-card-name-43j"
+                    id="department-input-field"
+                    value={department}
+                    onChange={(e) => setDepartment(e.target.value)}
                     placeholder="e.g. Technology"
                     required
                   />
@@ -128,11 +138,13 @@ export function JobPostForm() {
 
                 {/* Function */}
                 <Field>
-                  <FieldLabel htmlFor="checkout-7j9-card-name-43j">
+                  <FieldLabel htmlFor="function-input-field">
                     Function
                   </FieldLabel>
                   <Input
-                    id="checkout-7j9-card-name-43j"
+                    id="function-input-field"
+                    value={functionField}
+                    onChange={(e) => setFunctionField(e.target.value)}
                     placeholder="e.g. Technology"
                     required
                   />
@@ -144,22 +156,26 @@ export function JobPostForm() {
 
                 {/* Salary Range */}
                 <Field>
-                  <FieldLabel htmlFor="checkout-7j9-card-name-43j">
+                  <FieldLabel htmlFor="min-salary-input-field">
                     Min Salary
                   </FieldLabel>
                   <Input
-                    id="checkout-7j9-card-name-43j"
+                    id="min-salary-input-field"
+                    value={minSalary}
+                    onChange={(e) => setMinSalary(e.target.value)}
                     placeholder="e.g. 50,000k"
                     required
                   />
                 </Field>
 
                 <Field>
-                  <FieldLabel htmlFor="checkout-7j9-card-name-43j">
+                  <FieldLabel htmlFor="max-salary-input-field">
                     Max Salary
                   </FieldLabel>
                   <Input
-                    id="checkout-7j9-card-name-43j"
+                    id="max-salary-input-field"
+                    value={maxSalary}
+                    onChange={(e) => setMaxSalary(e.target.value)}
                     placeholder="e.g. 100,000k"
                     required
                   />
@@ -169,11 +185,13 @@ export function JobPostForm() {
 
               {/* About the Job */}
               <Field>
-                <FieldLabel htmlFor="checkout-7j9-optional-comments">
+                <FieldLabel htmlFor="job-description-input-field">
                   Job Description
                 </FieldLabel>
                 <Textarea
-                  id="checkout-7j9-optional-comments"
+                  id="job-description-input-field"
+                  value={jobDescription}
+                  onChange={(e) => setJobDescription(e.target.value)}
                   placeholder={"Copy the \"About the Job\" section from LinkedIn to here."}
                   className="resize-none"
                 />
@@ -181,11 +199,13 @@ export function JobPostForm() {
 
               {/* Benefits */}
               <Field>
-                <FieldLabel htmlFor="checkout-7j9-optional-comments">
+                <FieldLabel htmlFor="benefits-input-field">
                   Benefits
                 </FieldLabel>
                 <Textarea
-                  id="checkout-7j9-optional-comments"
+                  id="benefits-input-field"
+                  value={benefits}
+                  onChange={(e) => setBenefits(e.target.value)}
                   placeholder={"Copy the \"Benefits\" section from LinkedIn to here."}
                   className="resize-none"
                 />
@@ -195,35 +215,36 @@ export function JobPostForm() {
               <FieldGroup>
                 <div className="flex items-center space-x-6">
                   <Field orientation="horizontal">
-                    <Checkbox id="checkout-telecommuting" defaultChecked />
+                    <Checkbox id="checkout-telecommuting" checked={telecommuting} onChange={(v) => setTelecommuting(!!v)} />
                     <FieldLabel htmlFor="checkout-telecommuting" className="font-normal">
                       Telecommuting
                     </FieldLabel>
                   </Field>
 
                   <Field orientation="horizontal">
-                    <Checkbox id="checkout-has-company-logo" />
+                    <Checkbox id="checkout-has-company-logo" checked={hasCompanyLogo} onChange={(v) => setHasCompanyLogo(!!v)} />
                     <FieldLabel htmlFor="checkout-has-company-logo" className="font-normal">
                       Has Company Logo
                     </FieldLabel>
                   </Field>
 
                   <Field orientation="horizontal">
-                    <Checkbox id="checkout-has-questions" />
+                    <Checkbox id="checkout-has-questions" checked={hasQuestions} onChange={(v) => setHasQuestions(!!v)} />
                     <FieldLabel htmlFor="checkout-has-questions" className="font-normal">
                       Has Questions
                     </FieldLabel>
                   </Field>
 
                   <Field orientation="horizontal">
-                    <Checkbox id="checkout-has-questions" />
-                    <FieldLabel htmlFor="checkout-has-questions" className="font-normal">
+                    <Checkbox id="checkout-required-education" checked={requiredEducation} onChange={(v) => setRequiredEducation(!!v)} />
+                    <FieldLabel htmlFor="checkout-required-education" className="font-normal">
                       Required Education
                     </FieldLabel>
                   </Field>
                 </div>
               </FieldGroup>
 
+              {/* TODO: Start the parser and pass to FastAPI */}
               <Field orientation="horizontal">
                 <Button type="submit">Submit</Button>
                 <Button variant="outline" type="button">
