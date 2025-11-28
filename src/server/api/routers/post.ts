@@ -1,16 +1,18 @@
 import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
-import { jobPostFull, jobPostNoParse, LLMReturn } from "~/server/ml/job_post_schema";
+import { jobPostFull, jobPostNoParse, jobPostParse, LLMReturn } from "~/server/ml/job_post_schema";
 import { predictFraudulentJob } from "~/server/ml/predictor";
 
 export const formRouter = createTRPCRouter({
   reformat: publicProcedure
-    .input(z.object({ aboutTheJob: z.string() }))
+    .input(z.object({ aboutTheJob: jobPostParse }))
+    .output(LLMReturn)
     .mutation(async ({ input }) => {
       
       const mod = await import("~/server/ml/parser");
-      const res = await mod.extractJobFieldsWithLLM(input.aboutTheJob);
+      const result = await mod.extractJobFieldsWithLLM(input.aboutTheJob);
+      const res = LLMReturn.parse(result);
       return res;
     }),
   predict: publicProcedure

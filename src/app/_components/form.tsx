@@ -11,7 +11,6 @@ import {
   FieldGroup,
   FieldLabel,
   FieldLegend,
-  FieldSeparator,
   FieldSet,
 } from "~/components/ui/field"
 import {
@@ -22,6 +21,11 @@ import {
   SelectValue,
 } from "~/components/ui/select"
 
+import { api } from "~/trpc/react";
+
+import { jobPostNoParse, jobPostParse, LLMReturn, MLReturn } from "~/server/ml/job_post_schema";
+import type z from "zod";
+
 export function JobPostForm() {
 
   // Form states
@@ -30,7 +34,7 @@ export function JobPostForm() {
   const [employmentType, setEmploymentType] = useState("")
   const [industry, setIndustry] = useState("")
   const [department, setDepartment] = useState("")
-  const [functionField, setFunctionField] = useState("")
+  const [jobFunction, setJobFunction] = useState("")
   const [minSalary, setMinSalary] = useState("")
   const [maxSalary, setMaxSalary] = useState("")
   const [jobDescription, setJobDescription] = useState("")
@@ -39,9 +43,58 @@ export function JobPostForm() {
   const [hasCompanyLogo, setHasCompanyLogo] = useState(false)
   const [hasQuestions, setHasQuestions] = useState(false)
   const [requiredEducation, setRequiredEducation] = useState(false)
+  const [result, setResult] = useState<any | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(event: React.FormEvent) {
-    // TODO: Implement submission logic
+    event?.preventDefault();
+    setError(null);
+    setResult(null);
+
+    // hold all fields that's not going to be parse
+    const jobPostNoParseObj: z.infer<typeof jobPostNoParse> = {
+      job_id:
+        typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+          ? crypto.randomUUID()
+          : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`,
+      title: title,
+      location: location,
+      employmentType: employmentType,
+      industry: industry,
+      department: department,
+      function: jobFunction,
+      min_salary: minSalary,
+      max_salary: maxSalary,
+      benefits: benefits,
+      telecommuting: telecommuting,
+      has_company_logo: hasCompanyLogo,
+      has_questions: hasQuestions,
+      required_education: requiredEducation,
+    };
+
+    // hold field that needs to be parse
+    const jobPostParseObj: z.infer<typeof jobPostParse> = {
+      description: jobDescription,
+    };
+
+    // parse the aboutTheJob section with LLM to get company_profile, description, requirements
+    let LLMResponse: z.infer<typeof LLMReturn>;
+    let predictionResult: z.infer<typeof MLReturn>;
+    try {
+      LLMResponse = await api.form.reformat.useMutation().mutateAsync({ aboutTheJob: jobPostParseObj });
+      setResult(LLMResponse);
+      
+      // when done parsing, pass to FastAPI for prediction
+      try {
+        predictionResult = await api.form.predict.useMutation().mutateAsync({ jobPostNoParse: jobPostNoParseObj, LLMReturn: LLMResponse });
+        setResult(predictionResult);
+      } catch (err: any) {
+        setError(err?.message ?? String(err));
+      }    
+    } catch (err: any) {
+      setError(err?.message ?? String(err));
+    }
+    
   }
 
   return (
@@ -143,8 +196,8 @@ export function JobPostForm() {
                   </FieldLabel>
                   <Input
                     id="function-input-field"
-                    value={functionField}
-                    onChange={(e) => setFunctionField(e.target.value)}
+                    value={jobFunction}
+                    onChange={(e) => setJobFunction(e.target.value)}
                     placeholder="e.g. Technology"
                     required
                   />

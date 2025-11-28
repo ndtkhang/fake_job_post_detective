@@ -89,10 +89,10 @@ async function callLLM(systemPrompt: string, userPrompt: string): Promise<string
 }
 
 export async function extractJobFieldsWithLLM(
-  aboutTheJob: string,
+  aboutTheJob: z.infer<typeof jobPostParse>,
   maxRetries = 3,
 ) : Promise<z.infer<typeof jobPostParse>> {
-  let userPrompt = USER_PROMPT_TEMPLATE(aboutTheJob);
+  let userPrompt = USER_PROMPT_TEMPLATE(aboutTheJob.description);
   let lastRaw: string | null = null;
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -110,34 +110,6 @@ export async function extractJobFieldsWithLLM(
   throw new Error(
     `Could not parse JSON after ${maxRetries} attempts. Last response:\n${lastRaw}`,
   );
-}
-
-// Simple CLI entrypoint that can be used by a separate script
-export async function main(): Promise<number> {
-  // read stdin
-  const data = await (async () => {
-    return new Promise<string>((resolve) => {
-      let buf = "";
-      process.stdin.setEncoding("utf8");
-      process.stdin.on("data", (chunk) => (buf += chunk));
-      process.stdin.on("end", () => resolve(buf));
-    });
-  })();
-
-  const text = data.trim();
-  if (!text) {
-    console.error("No input provided on stdin.");
-    return 2;
-  }
-
-  try {
-    const record = await extractJobFieldsWithLLM(text);
-    console.log(JSON.stringify(record, null, 2));
-    return 0;
-  } catch (err: any) {
-    console.error("Extraction failed:", err.message ?? err);
-    return 1;
-  }
 }
 
 export default extractJobFieldsWithLLM;
