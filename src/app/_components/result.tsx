@@ -1,4 +1,20 @@
-export function Result() {
+import type z from "zod";
+import type { MLReturn } from "~/server/ml/job_post_schema";
+
+export function Result({
+    result,
+}: {
+    result: z.infer<typeof MLReturn> | null;
+}) {
+
+    const hasResult = !!result;
+    const maybeResult = hasResult
+      ? ((result as any).result ?? (result as any).fradulant ?? JSON.stringify(result))
+      : null;
+    const confidence = hasResult
+      ? Math.round(((result as any).confidence ?? 0) * 100)
+      : null;
+
     return (
         // Result on the right side
         <div className="flex-3 h-[80vh] px-8 pt-8 bg-card rounded-[48px]">
@@ -8,9 +24,9 @@ export function Result() {
             </div>
             <div className="flex flex-col gap-2 items-center py-24">
                 <div className="w-60 h-60 rounded-full bg-gray-200 flex flex-col font-extralight items-center justify-center shadow-md">
-                    <h1 className="text-6xl text-black">Fake</h1>
+                    <h1 className="text-6xl text-black">{hasResult ? maybeResult : "N/A"}</h1>
                     <p className="mt-1 text-gray-600">Confidence:</p>
-                    <h1 className="text-4xl text-black">95%</h1>
+                    <h1 className="text-4xl text-black">{hasResult ? confidence : 0}%</h1>
                 </div>
             </div>
         </div>

@@ -25,6 +25,7 @@ import { api } from "~/trpc/react";
 
 import { jobPostNoParse, jobPostParse, LLMReturn, MLReturn } from "~/server/ml/job_post_schema";
 import type z from "zod";
+import { Result } from "./result";
 
 export function JobPostForm() {
 
@@ -42,7 +43,8 @@ export function JobPostForm() {
   const [telecommuting, setTelecommuting] = useState(false)
   const [hasCompanyLogo, setHasCompanyLogo] = useState(false)
   const [hasQuestions, setHasQuestions] = useState(false)
-  const [requiredEducation, setRequiredEducation] = useState(false)
+  const [requiredExperience, setRequiredExperience] = useState("")
+  const [requiredEducation, setRequiredEducation] = useState("")
   const [result, setResult] = useState<any | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -70,6 +72,7 @@ export function JobPostForm() {
       has_company_logo: hasCompanyLogo,
       has_questions: hasQuestions,
       required_education: requiredEducation,
+      required_experience: requiredExperience,
     };
 
     // hold field that needs to be parse
@@ -83,231 +86,285 @@ export function JobPostForm() {
     try {
       LLMResponse = await api.form.reformat.useMutation().mutateAsync({ aboutTheJob: jobPostParseObj });
       setResult(LLMResponse);
-      
+
       // when done parsing, pass to FastAPI for prediction
       try {
         predictionResult = await api.form.predict.useMutation().mutateAsync({ jobPostNoParse: jobPostNoParseObj, LLMReturn: LLMResponse });
         setResult(predictionResult);
       } catch (err: any) {
         setError(err?.message ?? String(err));
-      }    
+      }
     } catch (err: any) {
       setError(err?.message ?? String(err));
     }
-    
+
   }
 
   return (
-    <div className="flex-7 px-8 py-8 bg-card rounded-[48px] shadow-medium">
-      <form onSubmit={handleSubmit}>
-        <FieldGroup>
-          <FieldSet>
-            <FieldLegend>Job Post</FieldLegend>
-            <FieldDescription>
-              Below are some questions about the job posts you saw.
-            </FieldDescription>
-            <FieldGroup>
-
-              <div className="grid grid-cols-3 gap-4">
-
-                {/* Job Title */}
-                <Field>
-                  <FieldLabel htmlFor="job-title-input-field">
-                    Job Title
-                  </FieldLabel>
-                  <Input
-                    id="job-title-input-field"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="e.g. React Developer"
-                    required
-                  />
-                </Field>
-
-                {/* Location */}
-                <Field>
-                  <FieldLabel htmlFor="location-input-field">
-                    Location
-                  </FieldLabel>
-                  <Input
-                    id="location-input-field"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    placeholder="e.g. New York, NY"
-                    required
-                  />
-                </Field>
-
-                {/* Job Type */}
-                <Field>
-                  <FieldLabel htmlFor="employment-type-select">
-                    Employment Type
-                  </FieldLabel>
-                  <Select value={employmentType} onValueChange={setEmploymentType} defaultValue="Not Specified">
-                    <SelectTrigger id="employment-type-select">
-                      <SelectValue placeholder="Not Specified" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Not Specified">Not Specified</SelectItem>
-                      <SelectItem value="Intern">Intern</SelectItem>
-                      <SelectItem value="Part-Time">Part-Time</SelectItem>
-                      <SelectItem value="Full-Time">Full-Time</SelectItem>
-                      <SelectItem value="Contractor">Contractor</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </Field>
-
-              </div>
-
-              <div className="grid grid-cols-3 gap-4">
-
-                {/* Industry */}
-                <Field>
-                  <FieldLabel htmlFor="industry-input-field">
-                    Industry
-                  </FieldLabel>
-                  <Input
-                    id="industry-input-field"
-                    value={industry}
-                    onChange={(e) => setIndustry(e.target.value)}
-                    placeholder="e.g. Technology"
-                    required
-                  />
-                </Field>
-
-                {/* Department */}
-                <Field>
-                  <FieldLabel htmlFor="department-input-field">
-                    Department
-                  </FieldLabel>
-                  <Input
-                    id="department-input-field"
-                    value={department}
-                    onChange={(e) => setDepartment(e.target.value)}
-                    placeholder="e.g. Technology"
-                    required
-                  />
-                </Field>
-
-                {/* Function */}
-                <Field>
-                  <FieldLabel htmlFor="function-input-field">
-                    Function
-                  </FieldLabel>
-                  <Input
-                    id="function-input-field"
-                    value={jobFunction}
-                    onChange={(e) => setJobFunction(e.target.value)}
-                    placeholder="e.g. Technology"
-                    required
-                  />
-                </Field>
-
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-
-                {/* Salary Range */}
-                <Field>
-                  <FieldLabel htmlFor="min-salary-input-field">
-                    Min Salary
-                  </FieldLabel>
-                  <Input
-                    id="min-salary-input-field"
-                    value={minSalary}
-                    onChange={(e) => setMinSalary(e.target.value)}
-                    placeholder="e.g. 50,000k"
-                    required
-                  />
-                </Field>
-
-                <Field>
-                  <FieldLabel htmlFor="max-salary-input-field">
-                    Max Salary
-                  </FieldLabel>
-                  <Input
-                    id="max-salary-input-field"
-                    value={maxSalary}
-                    onChange={(e) => setMaxSalary(e.target.value)}
-                    placeholder="e.g. 100,000k"
-                    required
-                  />
-                </Field>
-
-              </div>
-
-              {/* About the Job */}
-              <Field>
-                <FieldLabel htmlFor="job-description-input-field">
-                  Job Description
-                </FieldLabel>
-                <Textarea
-                  id="job-description-input-field"
-                  value={jobDescription}
-                  onChange={(e) => setJobDescription(e.target.value)}
-                  placeholder={"Copy the \"About the Job\" section from LinkedIn to here."}
-                  className="resize-none"
-                />
-              </Field>
-
-              {/* Benefits */}
-              <Field>
-                <FieldLabel htmlFor="benefits-input-field">
-                  Benefits
-                </FieldLabel>
-                <Textarea
-                  id="benefits-input-field"
-                  value={benefits}
-                  onChange={(e) => setBenefits(e.target.value)}
-                  placeholder={"Copy the \"Benefits\" section from LinkedIn to here."}
-                  className="resize-none"
-                />
-              </Field>
-
-              {/* Telecommuting / Has Company Logo / Has Questions */}
+    <div className="flex flex-col lg:flex-row gap-6 px-4 md:px-32 py-16 sm:px-8">
+      <div className="flex-7 px-8 py-8 bg-card rounded-[48px] shadow-medium">
+        <form onSubmit={handleSubmit}>
+          <FieldGroup>
+            <FieldSet>
+              <FieldLegend>Job Post</FieldLegend>
+              <FieldDescription>
+                Below are some questions about the job posts you saw.
+              </FieldDescription>
               <FieldGroup>
-                <div className="flex items-center space-x-6">
-                  <Field orientation="horizontal">
-                    <Checkbox id="checkout-telecommuting" checked={telecommuting} onChange={(v) => setTelecommuting(!!v)} />
-                    <FieldLabel htmlFor="checkout-telecommuting" className="font-normal">
-                      Telecommuting
+
+                <div className="grid grid-cols-3 gap-4">
+
+                  {/* Job Title */}
+                  <Field>
+                    <FieldLabel htmlFor="job-title-input-field">
+                      Job Title
                     </FieldLabel>
+                    <Input
+                      id="job-title-input-field"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      placeholder="e.g. React Developer"
+                      required
+                    />
                   </Field>
 
-                  <Field orientation="horizontal">
-                    <Checkbox id="checkout-has-company-logo" checked={hasCompanyLogo} onChange={(v) => setHasCompanyLogo(!!v)} />
-                    <FieldLabel htmlFor="checkout-has-company-logo" className="font-normal">
-                      Has Company Logo
+                  {/* Location */}
+                  <Field>
+                    <FieldLabel htmlFor="location-input-field">
+                      Location
                     </FieldLabel>
+                    <Input
+                      id="location-input-field"
+                      value={location}
+                      onChange={(e) => setLocation(e.target.value)}
+                      placeholder="e.g. New York, NY"
+                      required
+                    />
                   </Field>
 
-                  <Field orientation="horizontal">
-                    <Checkbox id="checkout-has-questions" checked={hasQuestions} onChange={(v) => setHasQuestions(!!v)} />
-                    <FieldLabel htmlFor="checkout-has-questions" className="font-normal">
-                      Has Questions
+                  {/* Job Type */}
+                  <Field>
+                    <FieldLabel htmlFor="employment-type-select">
+                      Employment Type
                     </FieldLabel>
+                    <Select value={employmentType} onValueChange={setEmploymentType} defaultValue="Missing">
+                      <SelectTrigger id="employment-type-select">
+                        <SelectValue placeholder="Select" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Full-time">Full-Time</SelectItem>
+                        <SelectItem value="Part-time">Part-time</SelectItem>
+                        <SelectItem value="Temporary">Temporary</SelectItem>
+                        <SelectItem value="Contract">Contractor</SelectItem>
+                        <SelectItem value="Missing">Not Specified</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </Field>
 
-                  <Field orientation="horizontal">
-                    <Checkbox id="checkout-required-education" checked={requiredEducation} onChange={(v) => setRequiredEducation(!!v)} />
-                    <FieldLabel htmlFor="checkout-required-education" className="font-normal">
+                </div>
+
+                <div className="grid grid-cols-3 gap-4">
+
+                  {/* Industry */}
+                  <Field>
+                    <FieldLabel htmlFor="industry-input-field">
+                      Industry
+                    </FieldLabel>
+                    <Input
+                      id="industry-input-field"
+                      value={industry}
+                      onChange={(e) => setIndustry(e.target.value)}
+                      placeholder="e.g. Technology"
+                      required
+                    />
+                  </Field>
+
+                  {/* Department */}
+                  <Field>
+                    <FieldLabel htmlFor="department-input-field">
+                      Department
+                    </FieldLabel>
+                    <Input
+                      id="department-input-field"
+                      value={department}
+                      onChange={(e) => setDepartment(e.target.value)}
+                      placeholder="e.g. Technology"
+                      required
+                    />
+                  </Field>
+
+                  {/* Function */}
+                  <Field>
+                    <FieldLabel htmlFor="function-select">
+                      Function
+                    </FieldLabel>
+                    <Select value={jobFunction} onValueChange={setJobFunction} defaultValue="Missing">
+                      <SelectTrigger id="function-select">
+                        <SelectValue placeholder="Select" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Information Technology">IT</SelectItem>
+                        <SelectItem value="Sales">Sales</SelectItem>
+                        <SelectItem value="Engineering">Engineering</SelectItem>
+                        <SelectItem value="Customer Service">Customer Service</SelectItem>
+                        <SelectItem value="Marketing">Marketing</SelectItem>
+                        <SelectItem value="Administrative">Administrative</SelectItem>
+                        <SelectItem value="Design">Design</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </Field>
+
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+
+                  {/* Salary Range */}
+                  <Field>
+                    <FieldLabel htmlFor="min-salary-input-field">
+                      Min Salary
+                    </FieldLabel>
+                    <Input
+                      id="min-salary-input-field"
+                      value={minSalary}
+                      onChange={(e) => setMinSalary(e.target.value)}
+                      placeholder="e.g. 50,000k"
+                      required
+                    />
+                  </Field>
+
+                  <Field>
+                    <FieldLabel htmlFor="max-salary-input-field">
+                      Max Salary
+                    </FieldLabel>
+                    <Input
+                      id="max-salary-input-field"
+                      value={maxSalary}
+                      onChange={(e) => setMaxSalary(e.target.value)}
+                      placeholder="e.g. 100,000k"
+                      required
+                    />
+                  </Field>
+
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+
+                  {/* Required Experience */}
+                  <Field>
+                    <FieldLabel htmlFor="required-experience-select">
+                      Required Experience
+                    </FieldLabel>
+                    <Select value={requiredExperience} onValueChange={setRequiredExperience} defaultValue="Missing">
+                      <SelectTrigger id="required-experience-select">
+                        <SelectValue placeholder="Select" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Mid-Senior level">Mid-Senior Level</SelectItem>
+                        <SelectItem value="Entry level">Entry Level</SelectItem>
+                        <SelectItem value="Associate">Associate</SelectItem>
+                        <SelectItem value="No Applicable">Not Application</SelectItem>
+                        <SelectItem value="Director">Director</SelectItem>
+                        <SelectItem value="Internship">Internship</SelectItem>
+                        <SelectItem value="Executive">Executive</SelectItem>
+                        <SelectItem value="Missing">Not Specified</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </Field>
+
+                  {/* Required Education */}
+                  <Field>
+                    <FieldLabel htmlFor="required-education-select">
                       Required Education
                     </FieldLabel>
+                    <Select value={requiredEducation} onValueChange={setRequiredEducation} defaultValue="Missing">
+                      <SelectTrigger id="required-education-select">
+                        <SelectValue placeholder="Select" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Unspecified">Unspecified</SelectItem>
+                        <SelectItem value="Missing">Missing</SelectItem>
+                        <SelectItem value="High School or equivalent">High School or Equivalent</SelectItem>
+                        <SelectItem value="Some College Coursework Completed">Some College Coursework Completed</SelectItem>
+                        <SelectItem value="Associate Degree">Associate Degree</SelectItem>
+                        <SelectItem value="Bachelor Degree">Bachelor Degree</SelectItem>
+                        <SelectItem value="Master's Degree">Master's Degree</SelectItem>
+                        <SelectItem value="Certification">Certification</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </Field>
-                </div>
-              </FieldGroup>
 
-              {/* TODO: Start the parser and pass to FastAPI */}
-              <Field orientation="horizontal">
-                <Button type="submit">Submit</Button>
-                <Button variant="outline" type="button">
-                  Cancel
-                </Button>
-              </Field>
-            </FieldGroup>
-          </FieldSet>
-        </FieldGroup>
-      </form>
+                  {/* Required Education */}
+                </div>
+
+                {/* About the Job */}
+                <Field>
+                  <FieldLabel htmlFor="job-description-input-field">
+                    Job Description
+                  </FieldLabel>
+                  <Textarea
+                    id="job-description-input-field"
+                    value={jobDescription}
+                    onChange={(e) => setJobDescription(e.target.value)}
+                    placeholder={"Copy the \"About the Job\" section from LinkedIn to here."}
+                    className="resize-none"
+                  />
+                </Field>
+
+                {/* Benefits */}
+                <Field>
+                  <FieldLabel htmlFor="benefits-input-field">
+                    Benefits
+                  </FieldLabel>
+                  <Textarea
+                    id="benefits-input-field"
+                    value={benefits}
+                    onChange={(e) => setBenefits(e.target.value)}
+                    placeholder={"Copy the \"Benefits\" section from LinkedIn to here."}
+                    className="resize-none"
+                  />
+                </Field>
+
+                {/* Telecommuting / Has Company Logo / Has Questions */}
+                <FieldGroup>
+                  <div className="flex items-center space-x-6">
+                    <Field orientation="horizontal">
+                      <Checkbox id="checkout-telecommuting" checked={telecommuting} onChange={(v) => setTelecommuting(!!v)} />
+                      <FieldLabel htmlFor="checkout-telecommuting" className="font-normal">
+                        Telecommuting
+                      </FieldLabel>
+                    </Field>
+
+                    <Field orientation="horizontal">
+                      <Checkbox id="checkout-has-company-logo" checked={hasCompanyLogo} onChange={(v) => setHasCompanyLogo(!!v)} />
+                      <FieldLabel htmlFor="checkout-has-company-logo" className="font-normal">
+                        Has Company Logo
+                      </FieldLabel>
+                    </Field>
+
+                    <Field orientation="horizontal">
+                      <Checkbox id="checkout-has-questions" checked={hasQuestions} onChange={(v) => setHasQuestions(!!v)} />
+                      <FieldLabel htmlFor="checkout-has-questions" className="font-normal">
+                        Has Questions
+                      </FieldLabel>
+                    </Field>
+                  </div>
+                </FieldGroup>
+
+                {/* TODO: Start the parser and pass to FastAPI */}
+                <Field orientation="horizontal">
+                  <Button type="submit">Submit</Button>
+                  <Button variant="outline" type="button">
+                    Cancel
+                  </Button>
+                </Field>
+              </FieldGroup>
+            </FieldSet>
+          </FieldGroup>
+        </form>
+      </div>
+      
+      <Result result={result} />
     </div>
+
   );
 }

@@ -36,7 +36,8 @@ export const jobPostNoParse = z.object({
   telecommuting: z.boolean(),
   has_company_logo: z.boolean(),
   has_questions: z.boolean(),
-  required_education: z.boolean(),
+  required_education: z.string(),
+  required_experience: z.string(),
 });
 
 // Everything that's not going to be passed to the LLM

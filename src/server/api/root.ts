@@ -1,4 +1,4 @@
-import { formRouter } from "~/server/api/routers/post";
+import { formRouter } from "~/server/api/routers/form";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 
 /**
