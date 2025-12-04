@@ -26,7 +26,7 @@ export function Result({
             <div className="flex flex-col gap-2 items-center py-24">
                 <div className="w-70 h-70 rounded-full bg-gray-200 flex flex-col font-extralight items-center justify-center shadow-md">
                     <h1 className="text-6xl text-black">{result ? prediction : "N/A"}</h1>
-                    <p className="mt-1 text-gray-600">Probability:</p>
+                    <p className="mt-1 text-gray-600">Fraud Probability:</p>
                     <h1 className="text-4xl text-black">{result ? probability : 0}%</h1>
                     <p className="mt-1 text-gray-600">Confidence:</p>
                     <h1 className="text-4xl text-black">{result ? confidence : "N/A"}</h1>

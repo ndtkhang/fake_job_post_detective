@@ -81,7 +81,7 @@ export function NavBar() {
 
           {/* Contributors */}
           <NavigationMenuItem>
-          <NavigationMenuTrigger>Contributors</NavigationMenuTrigger>
+          <NavigationMenuTrigger>Contributors' Portfolios</NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid gap-2 sm:w-[400px] md:w-[500px] md:grid-cols-2 lg:w-[600px]">
               {contributors.map((component) => (
